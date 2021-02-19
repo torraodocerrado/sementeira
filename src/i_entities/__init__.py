@@ -1,0 +1,1 @@
+from .pessoa import Pessoa
