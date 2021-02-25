@@ -16,3 +16,7 @@ class PessoaController():
             response = self.dataGateway.cadastrar(pessoa)
         return response
 
+    def pesquisarPessoa(self, params)-> list:
+        response = self.dataGateway.pesquisar(params)
+        return response
+

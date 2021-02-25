@@ -1,5 +1,7 @@
 class AbstractQuery():
-    name: str
+    params: dict
+    nome: str
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, nome: str, params):
+        self.params = params
+        self.nome = nome
