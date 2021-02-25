@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import cross_origin
 from flask_api import status
+from datetime import datetime
 
-from ..i_entities import Pessoa
-from ..iii_controllers import PessoaController
-from ..iv_database import PessoaDataGatewayRelacional
-from ..iv_database import PessoaCreatorDataGateway
+from sementeira.i_entities import Pessoa
+from sementeira.iii_controllers import PessoaController
+from sementeira.iv_database import PessoaDataGatewayRelacional
+from sementeira.iv_database import PessoaCreatorDataGateway
 
 
 app = Flask(__name__)
@@ -20,7 +21,7 @@ def build_return(response, status_code):
     return jsonify({"status_code": status_code, "data": response})
 
 def get_tecnologia_persistencia():
-    return "relacional"
+    return "json"
 
 def get_pessoa_data_gateway():
     creator = PessoaCreatorDataGateway()
@@ -32,8 +33,9 @@ def cadastrar_pessoa():
     result = []
     status_code = status.HTTP_200_OK
     try:
-        data = request.json
-        pessoa = Pessoa(None, data.nome, data.endereco, data.data_nascimento)
+        data = request.json         
+        data_nascimento = datetime.strptime(data["data_nascimento"], '%Y-%m-%d')
+        pessoa = Pessoa(None, data["nome"], data["endereco"], data_nascimento)
         dataGateway = get_pessoa_data_gateway()
         pessoaController = PessoaController(dataGateway)
         result = pessoaController.cadastrarPessoa(pessoa)

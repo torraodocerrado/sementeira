@@ -10,7 +10,9 @@ class PessoaController():
         self.dataGateway = dataGateway
         self.pessoaModule = PessoaModule()
     
-    def cadastrarPessoa(self, pessoa: Pessoa):
+    def cadastrarPessoa(self, pessoa: Pessoa)->Pessoa:
+        response = None
         if self.pessoaModule.validar_casos_uso(pessoa):
-            self.dataGateway.cadastrar(pessoa)
+            response = self.dataGateway.cadastrar(pessoa)
+        return response
 
