@@ -51,6 +51,7 @@ def cadastrar_pessoa():
         dataGateway = get_pessoa_data_gateway()
         pessoaController = PessoaController(dataGateway)
         result = pessoaController.cadastrarPessoa(pessoa)
+        print(result)
     except Exception as e:
         status_code = status.HTTP_400_BAD_REQUEST
         result = str(e)

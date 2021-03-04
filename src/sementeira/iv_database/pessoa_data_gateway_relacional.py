@@ -7,9 +7,11 @@ from pprint import pprint
 from ..i_entities import Pessoa
 from ..iii_controllers import AbstractDataGateway
 
+
 class PessoaDataGatewayRelacional(AbstractDataGateway):
     conn = None
     config = None
+    attributes = ["nome", "endereco", "data_nascimento"]
 
     def __init__(self, config):
         self.config = config
@@ -25,33 +27,35 @@ class PessoaDataGatewayRelacional(AbstractDataGateway):
             self.conn.autocommit = True
         return self.conn
 
-    def json(self, o):
-        if isinstance(o, (datetime.date, datetime.datetime)):
-            return o.isoformat()
-        else:
-            return o.__dict__
-
-    def to_json(self, data_object):
-        data_dump = json.dumps(data_object,
-                          sort_keys=True,
-                          indent=1,
-                          default=self.json)
-        response = json.loads(data_dump)
-        return response
-
-    def to_dict(self, data_object):
-        data = self.to_json(data_object)
-        return data
-    
     def cadastrar(self, pessoa: Pessoa):
         data = []
         try:
-            pessoa = self.to_dict(pessoa)
             cursor = self.get_connection().cursor(cursor_factory=psycopg2.extras.DictCursor)
-            cursor.execute(self.config.get('queries', "pessoa_cadastrar"), [pessoa["nome"], pessoa["endereco"], pessoa["data_nascimento"]])
-            print("aqui")
+            cursor.execute(self.config.get('queries', "pessoa_cadastrar"), [pessoa.nome,
+                                                                            pessoa.endereco,
+                                                                            pessoa.data_nascimento])
             answer = cursor.fetchall()
-            print(answer)
+            data = []
+            for row in answer:
+                data.append(dict(row))
+        except Exception as e:
+            print(e)
+            raise e
+        finally:
+            try:
+                cursor.close()
+            except:
+                pass
+        return data
+
+    def cadastrar(self, pessoa: Pessoa):
+        data = []
+        try:
+            cursor = self.get_connection().cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cursor.execute(self.config.get('queries', "pessoa_cadastrar"), [pessoa.nome,
+                                                                            pessoa.endereco,
+                                                                            pessoa.data_nascimento])
+            answer = cursor.fetchall()
             data = []
             for row in answer:
                 data.append(dict(row))

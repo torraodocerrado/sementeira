@@ -52,6 +52,7 @@ class PessoaDataGatewayJson(AbstractDataGateway):
         pessoa_json = self.parsePessoaJson(pessoa)
         output_file_name = self.get_output_file_name(pessoa)
         self.save_to_file(pessoa_json, output_file_name)
+        return [json.loads(pessoa_json)]
 
     def getJsonFiles(self):
         mypath = "."
