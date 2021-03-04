@@ -4,10 +4,12 @@ from .pessoa_data_gateway_json import PessoaDataGatewayJson
 
 class PessoaCreatorDataGateway(AbstractCreatorDataGateway):
 
-    def build(self, tipo: str):
+    def build(self, config):
+        print(config)
+        tipo = config.get("persistencia", "tecnologia")
         if tipo not in self._data_gateway:
             if tipo == 'relacional':
-                self._data_gateway[tipo] = PessoaDataGatewayRelacional()
+                self._data_gateway[tipo] = PessoaDataGatewayRelacional(config)
             if tipo == 'json':
                 self._data_gateway[tipo] = PessoaDataGatewayJson()
         if tipo in self._data_gateway:

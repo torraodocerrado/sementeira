@@ -2,7 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import cross_origin
 from flask_api import status
 from datetime import datetime
-from .config import read_system_config
+import os
+import configparser
 
 from sementeira.i_entities import Pessoa
 from sementeira.iii_controllers import PessoaController
@@ -10,10 +11,19 @@ from sementeira.iii_controllers import PesquisarPessoa
 from sementeira.iv_database import PessoaDataGatewayRelacional
 from sementeira.iv_database import PessoaCreatorDataGateway
 
+def test_if_config_file_exists(config_path):
+    if not os.path.isfile(config_path):
+        print('Config file *'+config_path +
+              '* is missing. Execution will be stopped!')
+        exit()
+
+def read_system_config(system_config = "system.config"):
+    test_if_config_file_exists(system_config)
+    config = configparser.RawConfigParser()
+    config.read(system_config)
+    return config
 
 app = Flask(__name__)
-
-CONFIG = read_system_config()
 
 def prepareJsonResult(data):
     return data
@@ -24,12 +34,10 @@ def build_return(response, status_code):
     response = prepareJsonResult(response)
     return jsonify({"status_code": status_code, "data": response})
 
-def get_tecnologia_persistencia():
-    return "json"
-
 def get_pessoa_data_gateway():
     creator = PessoaCreatorDataGateway()
-    return creator.build(get_tecnologia_persistencia())
+    config = read_system_config()
+    return creator.build(config)
 
 @app.route('/pessoa', methods=['POST'])
 @cross_origin()
