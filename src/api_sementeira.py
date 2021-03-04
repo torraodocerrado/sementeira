@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import cross_origin
 from flask_api import status
 from datetime import datetime
+from .config import read_system_config
 
 from sementeira.i_entities import Pessoa
 from sementeira.iii_controllers import PessoaController
@@ -11,6 +12,8 @@ from sementeira.iv_database import PessoaCreatorDataGateway
 
 
 app = Flask(__name__)
+
+CONFIG = read_system_config()
 
 def prepareJsonResult(data):
     return data

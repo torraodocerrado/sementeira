@@ -1,5 +1,6 @@
 import json
 import datetime
+import os
 from os import listdir
 from os.path import isfile, join
 
@@ -9,9 +10,25 @@ from ..iii_controllers import AbstractQuery
 
 
 class PessoaDataGatewayJson(AbstractDataGateway):
+    def get_folder(self):
+        return ".." + os.sep + "data" + os.sep
+
+    def get_next_id(self):
+        file_path = self.get_folder() + "pessoa_sequence.txt"
+        if os.path.isfile(file_path):
+            f = open(file_path, "r")
+            count = int(f.read().strip())
+            f.close()
+        else:
+            count = 0
+        count = count + 1
+        f = open(file_path, "w")
+        f.write(str(count))
+        f.close()
+        return count
 
     def get_output_file_name(self, pessoa: Pessoa):
-        return "pessoa_1_"+pessoa.nome+".json"
+        return self.get_folder()+"pessoa_"+str(pessoa.id)+".json"
 
     def save_to_file(self, pessoa, output_file_name):
         f = open(output_file_name, "w")
@@ -25,10 +42,13 @@ class PessoaDataGatewayJson(AbstractDataGateway):
             return o.__dict__
 
     def parsePessoaJson(self, pessoa: Pessoa):
-        return json.dumps(pessoa, sort_keys=True,
-                          indent=1, default=self.json)
+        return json.dumps(pessoa,
+                          sort_keys=True,
+                          indent=1,
+                          default=self.json)
 
     def cadastrar(self, pessoa: Pessoa):
+        pessoa.id = self.get_next_id()
         pessoa_json = self.parsePessoaJson(pessoa)
         output_file_name = self.get_output_file_name(pessoa)
         self.save_to_file(pessoa_json, output_file_name)
@@ -48,7 +68,6 @@ class PessoaDataGatewayJson(AbstractDataGateway):
                 if params["nome"].lower() in data["nome"].lower():
                     response.append(data)
         return response
-
 
     def pesquisar(self, query: AbstractQuery):
         if "pessoa_por_nome" in query.nome:
